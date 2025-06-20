@@ -5,10 +5,7 @@ import {
   draggable,
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import {
-  attachClosestEdge,
-  type Edge,
-} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import { attachClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { Button } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/solid';
 import {
@@ -40,14 +37,10 @@ interface DraggableButtonProps {
   setSelectedFormIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-interface DragData {
+interface DragData extends Record<string, unknown> {
   type: 'button';
   id: string;
   index: number;
-}
-
-interface DropTargetData extends DragData {
-  closestEdge: Edge | null;
 }
 
 // DraggableButton component
@@ -63,7 +56,7 @@ const DraggableButton: React.FC<DraggableButtonProps> = ({
   selectedFormIndex,
   setSelectedFormIndex,
 }) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isOver, setIsOver] = useState<boolean>(false);
 
@@ -74,7 +67,8 @@ const DraggableButton: React.FC<DraggableButtonProps> = ({
     return combine(
       draggable({
         element: el,
-        getInitialData: () => ({ type: 'button', id, index } as DragData),
+        getInitialData: () =>
+          ({ type: 'button', id, index } as Record<string, unknown>),
         onDragStart: () => {
           setIsDragging(true);
           onDragStart();
@@ -87,13 +81,17 @@ const DraggableButton: React.FC<DraggableButtonProps> = ({
       dropTargetForElements({
         element: el,
         getData: ({ input, element }) => {
-          return attachClosestEdge({ type: 'button', id, index } as DragData, {
-            element,
-            input,
-            allowedEdges: ['left', 'right'],
-          }) as DropTargetData;
+          return attachClosestEdge(
+            { type: 'button', id, index }, // now properly typed
+            {
+              element,
+              input,
+              allowedEdges: ['left', 'right'],
+            }
+          );
         },
-        canDrop: ({ source }) => (source.data as DragData).type === 'button',
+        canDrop: ({ source }) =>
+          (source.data as unknown as DragData).type === 'button',
         onDragEnter: () => setIsOver(true),
         onDragLeave: () => setIsOver(false),
         onDrop: () => setIsOver(false),
@@ -168,7 +166,7 @@ const DraggableButton: React.FC<DraggableButtonProps> = ({
       {selectedFormIndex == index && (
         <Button
           className="cursor-pointer"
-          onClick={(e) => {
+          onClick={() => {
             if (!buttonRef.current) return;
             const rect = buttonRef.current.getBoundingClientRect();
             setPosition({ x: rect.left, y: rect.top - 230 });

@@ -2,6 +2,8 @@ import { useRef, useEffect } from 'react';
 import { Button } from '@headlessui/react';
 import AddMenu from './AddMenu';
 
+type CreateFormFn = (pageType: string, index: number | undefined) => void;
+
 export default function AddButton({
   createForm,
   isShow,
@@ -11,7 +13,7 @@ export default function AddButton({
   isShow: boolean;
   setIsShow: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

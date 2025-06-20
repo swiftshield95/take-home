@@ -15,7 +15,7 @@ export default function AddMenu({
   index,
 }: {
   createForm: CreateFormFn;
-  index: number | undefined;
+  index?: number;
 }) {
   return (
     <div className="w-[300px] p-2 mt-3 relative shadow transparent">

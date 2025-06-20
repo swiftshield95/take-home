@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import {
+  extractClosestEdge,
+  type Edge,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { FlagIcon } from '@heroicons/react/24/solid';
 import {
   PencilIcon,
@@ -58,8 +61,8 @@ const App = () => {
         const target = location.current.dropTargets[0];
         if (!target) return;
 
-        const sourceData = source.data as DragData;
-        const targetData = target.data as DropTargetData;
+        const sourceData = source.data as unknown as DragData;
+        const targetData = target.data as unknown as DropTargetData;
 
         if (
           !sourceData ||
@@ -72,7 +75,9 @@ const App = () => {
 
         const sourceIndex = sourceData.index;
         const targetIndex = targetData.index;
-        const closestEdge = extractClosestEdge(targetData);
+        const closestEdge = extractClosestEdge(
+          targetData as unknown as Record<string, unknown>
+        );
 
         if (sourceIndex === targetIndex) return;
 
@@ -99,7 +104,7 @@ const App = () => {
         contextMenuRef.current &&
         !contextMenuRef.current.contains(event.target as Node) &&
         isShown &&
-        event.target.localName != 'svg'
+        (event.target as HTMLElement)?.localName !== 'svg'
       ) {
         setIsShown(false); // Hide only if clicked outside
       }
