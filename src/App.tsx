@@ -158,6 +158,31 @@ const App = () => {
     setIsShown(false);
   };
 
+  const deletePage = () => {
+    setForms((prev) => {
+      const newForms = [...prev];
+      newForms.splice(selectedFormIndex, 1); // remove the i-th element
+      return newForms;
+    });
+    setSelectedFormIndex((prev) => (prev == 0 ? 0 : prev - 1));
+    setIsShown(false);
+  };
+
+  const duplicatePage = () => {
+    setForms((prev) => {
+      const itemToDuplicate = prev[selectedFormIndex];
+      const newItem = {
+        ...itemToDuplicate,
+        id: `page-${prev.length}`, // or use uuid if needed
+        label: itemToDuplicate.label + ' (copy)',
+      };
+      const newForms = [...prev];
+      newForms.splice(selectedFormIndex + 1, 0, newItem); // insert after the original
+      return newForms;
+    });
+    setIsShown(false);
+  };
+
   return (
     <div className="relative h-screen">
       <div className="flex p-4 rounded overflow-x-auto top-[300px] absolute">
@@ -273,14 +298,20 @@ const App = () => {
                     Copy
                   </span>
                 </div>
-                <div className="flex items-center gap-[6px] hover:bg-gray-50 cursor-pointer">
+                <div
+                  className="flex items-center gap-[6px] hover:bg-gray-50 cursor-pointer"
+                  onClick={duplicatePage}
+                >
                   <DocumentDuplicateIcon className="h-4 w-4 text-[#9da4b2]" />
                   <span className="font-medium text-[14px] leading-[16px] tracking-[-0.015em] align-middle font-inter">
                     Duplicate
                   </span>
                 </div>
                 <div className="h-[0.5px] bg-[#e1e1e1]" />
-                <div className="flex items-center gap-[6px] hover:bg-gray-50 cursor-pointer">
+                <div
+                  className="flex items-center gap-[6px] hover:bg-gray-50 cursor-pointer"
+                  onClick={deletePage}
+                >
                   <TrashIcon className="h-4 w-4 text-[#ef494f]" />
                   <span className="font-medium text-[14px] leading-[16px] tracking-[-0.015em] align-middle font-inter text-[#ef494f]">
                     Delete
